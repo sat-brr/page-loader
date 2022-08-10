@@ -16,9 +16,9 @@ def write_data(path, data):
 def format_path_to_file(path, link):
     link = os.path.splitext(link)
     new_link = link[0]
-    split_link = re.split('\W+', new_link)
+    split_link = re.split(r'\W+', new_link)
     if split_link[0] == 'https' or split_link[0] == 'http':
-        split_link.pop(0)   
+        split_link.pop(0)
     file_name = '-'.join(split_link)
     if link[1] != '':
         file_name += link[1]
