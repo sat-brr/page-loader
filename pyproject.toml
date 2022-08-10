@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = ""
+authors = ["vlad moryakov <sat1sfy@vk.com>"]
+packages = [{include = "page_loader"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.28.1"
+requests-mock = "^1.9.3"
+
+[tool.poetry.dev-dependencies]
+requests-mock = "^1.9.3"
+requests = "^2.28.1"
+flake8 = "^5.0.4"
+pytest = "^7.1.2"
+pytest-cov = "^3.0.0"
+
+[tool.poetry.scripts]
+page-loader = "page_loader.scripts.page_load:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

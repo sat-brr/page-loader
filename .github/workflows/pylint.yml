@@ -1,0 +1,21 @@
+name: pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name : install python
+        uses: actions/setup-python@v2
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: install_poetry
+        run: |
+          pip install poetry
+      - name: make install  
+        run: |  
+          make install
+      - name: test flake8
+        run: |
+          make lint
