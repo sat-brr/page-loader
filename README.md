@@ -5,3 +5,4 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/1d7c678c91f935340e34/test_coverage)](https://codeclimate.com/github/sat-brr/python-project-lvl3/test_coverage)
 
 [![asciicast](https://asciinema.org/a/Os4XSceCpSoqcG1PVMKxcMn09.svg)](https://asciinema.org/a/Os4XSceCpSoqcG1PVMKxcMn09)
+[![asciicast](https://asciinema.org/a/NFeopmx2C30m474TypUqTMt1Z.svg)](https://asciinema.org/a/NFeopmx2C30m474TypUqTMt1Z)
