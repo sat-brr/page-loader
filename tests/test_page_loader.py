@@ -44,3 +44,26 @@ def test_download_pics():
             assert exists(file1)
             assert exists(file2)
             assert exists(file3)
+
+
+def test_download_lnk_scr():
+    with requests_mock.Mocker()as m:
+        test_page = open('tests/fixtures/test_scr_link.html', 'r').read()
+        m.get('https://testing.ru', text=test_page)
+        link1 = open('tests/fixtures/links/link1.css', 'rb').read()
+        m.get('https://testing.ru/tests/fixtures/links/link1.css',
+              content=link1)
+        script1 = open('tests/fixtures/scripts/script1.js', 'rb').read()
+        m.get('https://testing.ru/tests/fixtures/scripts/script1.js',
+              content=script1)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            page_loader.download(tmp_dir, 'https://testing.ru')
+            new_dir = tmp_dir + '/testing-ru_files'
+            file1 = new_dir + '/testing-ru-tests-fixtures-links-link1.css'
+            file2 = new_dir + '/testing-ru-tests-fixtures-scripts-script1.js'
+            file3 = new_dir + '/hexlet-io-assets-menu.css'
+            file4 = new_dir + '/hexlet-io-v3-scr.js'
+            assert exists(file1)
+            assert exists(file2)
+            assert not exists(file3)
+            assert not exists(file4)
