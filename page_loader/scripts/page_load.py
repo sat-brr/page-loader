@@ -5,7 +5,7 @@ from page_loader.cli import parsing_args
 
 def main():
     args = parsing_args()
-    print(download(args.output, args.link))
+    download(args.output, args.link)
 
 
 if __name__ == '__main__':

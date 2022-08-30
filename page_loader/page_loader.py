@@ -3,9 +3,19 @@ import os
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+import logging
 
 
 TAGS = ('img', 'link', 'script')
+
+
+class KnownError(Exception):
+    pass
+
+
+def create_log_file():
+    logging.basicConfig(level=logging.INFO)
+    logging.StreamHandler()
 
 
 def find_by_tag(parse):
@@ -31,14 +41,17 @@ def get_element_url(elem):
 
 def make_dir(dir, url):
     dir_path = f'{dir}/{make_path(url, dir=True)}'
+    logging.info(f'Directory {dir_path} creating...')
     try:
         os.mkdir(dir_path)
+        logging.info('Directory created')
     except FileExistsError:
-        pass
+        logging.info('Directory exists')
     return dir_path
 
 
 def get_files(page, url, dir):
+    logging.info('Download files...')
     dir_path = make_dir(dir, url)
     domain = get_domain(url)
     open_page = open(page)
@@ -54,20 +67,29 @@ def get_files(page, url, dir):
         full_url = domain + elem_url
         path_to_file = f'{dir_path}/{make_path(full_url, file=True)}'
         with open(path_to_file, 'wb') as file:
-            file.write(requests.get(full_url).content)
+            try:
+                file.write(requests.get(full_url).content)
+            except Exception:
+                logging.error(f'Download file ({full_url}) fail !!!')
         element[key] = path_to_file
     saved_changes = soup.prettify()
     open_page.close()
     open_page = open(page, 'r+')
     open_page.write(saved_changes)
     open_page.close()
+    logging.info('Downloading files successful')
 
 
 def create_html_file(dir, url):
-    data = requests.get(url).text
-    path = f'{dir}/{make_path(url)}.html'
-    with open(path, 'w+') as file:
-        file.write(data)
+    logging.info('Loading page...')
+    try:
+        data = requests.get(url).text
+        path = f'{dir}/{make_path(url)}.html'
+        with open(path, 'w+') as file:
+            file.write(data)
+        logging.info('Loading page success.')
+    except requests.ConnectionError as err:
+        raise KnownError('Connection fail') from err
     return path
 
 
@@ -101,6 +123,7 @@ def make_path(url, file=False, dir=False):
 
 
 def download(dir, url):
+    create_log_file()
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
-    return path_to_url
+    logging.info(f"Page was downloaded as '{path_to_url}'.")
