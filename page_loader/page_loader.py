@@ -4,18 +4,21 @@ import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import logging
-
-
+from progress.bar import Bar
 TAGS = ('img', 'link', 'script')
+
+
+logger = logging.getLogger('page-loader')
+logger.setLevel(logging.INFO)
+f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
+sh = logging.StreamHandler()
+sh.setLevel(logging.INFO)
+sh.setFormatter(f)
+logger.addHandler(sh)
 
 
 class KnownError(Exception):
     pass
-
-
-def create_log_file():
-    logging.basicConfig(level=logging.INFO)
-    logging.StreamHandler()
 
 
 def find_by_tag(parse):
@@ -41,22 +44,23 @@ def get_element_url(elem):
 
 def make_dir(dir, url):
     dir_path = f'{dir}/{make_path(url, dir=True)}'
-    logging.info(f'Directory {dir_path} creating...')
+    logger.info(f'Directory {dir_path} creating...')
     try:
         os.mkdir(dir_path)
-        logging.info('Directory created')
+        logger.info('Directory created')
     except FileExistsError:
-        logging.info('Directory exists')
+        logger.warning('Directory exists')
     return dir_path
 
 
 def get_files(page, url, dir):
-    logging.info('Download files...')
     dir_path = make_dir(dir, url)
+    logger.info('Download files...')
     domain = get_domain(url)
     open_page = open(page)
     soup = BeautifulSoup(open_page, 'html.parser')
     elements = find_by_tag(soup)
+    bar = Bar('Downloading:', max=len(elements))
     for element in elements:
         elem_url, key = get_element_url(element)
         domain_lnk = get_domain(elem_url)
@@ -70,27 +74,39 @@ def get_files(page, url, dir):
             try:
                 file.write(requests.get(full_url).content)
             except Exception:
-                logging.error(f'Download file ({full_url}) fail !!!')
+                logger.warning(f'Download file ({full_url}) fail !!!')
+        bar.next()
         element[key] = path_to_file
     saved_changes = soup.prettify()
     open_page.close()
     open_page = open(page, 'r+')
     open_page.write(saved_changes)
     open_page.close()
-    logging.info('Downloading files successful')
+    bar.finish()
+    logger.info('Downloading files successful!')
 
 
 def create_html_file(dir, url):
-    logging.info('Loading page...')
     try:
-        data = requests.get(url).text
-        path = f'{dir}/{make_path(url)}.html'
-        with open(path, 'w+') as file:
-            file.write(data)
-        logging.info('Loading page success.')
-    except requests.ConnectionError as err:
-        raise KnownError('Connection fail') from err
-    return path
+        try:
+            logger.info(f'Requesting url: {url}')
+            data = requests.get(url)
+            data.raise_for_status()
+            path = f'{dir}/{make_path(url)}.html'
+            with open(path, 'w+') as file:
+                file.write(data.text)
+            logger.info(f'Write html file: {path}')
+            return path
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError,
+                requests.exceptions.Timeout) as err:
+            logger.error(f'Connection error from "{url}". Errcode: {err}')
+            raise KnownError() from err
+        except requests.exceptions.MissingSchema as err:
+            logger.error(f'Invalid URL {url}: No scheme supplied.')
+            raise KnownError() from err
+    except KnownError:
+        raise SystemExit
 
 
 def get_domain(url):
@@ -117,13 +133,25 @@ def make_path(url, file=False, dir=False):
     if ext == '.html':
         path = re.split(r'\W+', path)
         path = '-'.join(path)
-        return re.split(r'\W+', path)
+        return path
     full_path = re.split(r'\W+', url)
     return '-'.join(full_path)
 
 
 def download(dir, url):
-    create_log_file()
+    try:
+        try:
+            open(dir, 'r')
+            logger.error('Invalid directory path specified!')
+            raise KnownError()
+        except (FileNotFoundError, PermissionError) as err:
+            logger.error("Directory does not exist or access denied. "
+                         f'Error code: {err}')
+            raise KnownError() from err
+        except IsADirectoryError:
+            pass
+    except KnownError:
+        raise SystemExit
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
-    logging.info(f"Page was downloaded as '{path_to_url}'.")
+    logger.info(f"Page was downloaded as '{path_to_url}'.")
