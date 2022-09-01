@@ -138,7 +138,7 @@ def make_path(url, file=False, dir=False):
     return '-'.join(full_path)
 
 
-def download(dir, url):
+def download(url, dir):
     try:
         try:
             open(dir, 'r')
