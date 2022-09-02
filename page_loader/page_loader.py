@@ -124,6 +124,10 @@ def make_path(url, file=False, dir=False):
         path = re.split(r'\W+', path)
         path = '-'.join(path)
         return path + ext
+    if ext == '.html':
+        path = re.split(r'\W+', path)
+        path = '-'.join(path)
+        return path
     if file:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
