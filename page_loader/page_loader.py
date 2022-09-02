@@ -43,18 +43,19 @@ def get_element_url(elem):
 
 
 def make_dir(dir, url):
-    dir_path = f'{dir}/{make_path(url, dir=True)}'
-    logger.info(f'Directory {dir_path} creating...')
+    new_dir = make_path(url, dir=True)
+    full_path = f'{dir}/{new_dir}'
+    logger.info(f'Directory {full_path} creating...')
     try:
-        os.mkdir(dir_path)
+        os.mkdir(full_path)
         logger.info('Directory created')
     except FileExistsError:
         logger.warning('Directory exists')
-    return dir_path
+    return new_dir, full_path
 
 
 def get_files(page, url, dir):
-    dir_path = make_dir(dir, url)
+    new_dir, full_path = make_dir(dir, url)
     logger.info('Download files...')
     domain = get_domain(url)
     open_page = open(page)
@@ -69,14 +70,15 @@ def get_files(page, url, dir):
         else:
             continue
         full_url = domain + elem_url
-        path_to_file = f'{dir_path}/{make_path(full_url, file=True)}'
-        with open(path_to_file, 'wb') as file:
+        local_path_file = make_path(full_url, file=True)
+        full_path_to_file = f'{full_path}/{local_path_file}'
+        with open(full_path_to_file, 'wb') as file:
             try:
                 file.write(requests.get(full_url).content)
             except Exception:
                 logger.warning(f'Download file ({full_url}) fail !!!')
         bar.next()
-        element[key] = path_to_file
+        element[key] = f"{new_dir}/{local_path_file}"
     saved_changes = soup.prettify()
     open_page.close()
     open_page = open(page, 'r+')
@@ -118,6 +120,10 @@ def make_path(url, file=False, dir=False):
     if url[-1] == '/':
         url = url[:-1]
     path, ext = os.path.splitext(url)
+    if ext == '.html' and file is True:
+        path = re.split(r'\W+', path)
+        path = '-'.join(path)
+        return path
     if file:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
@@ -127,10 +133,6 @@ def make_path(url, file=False, dir=False):
         path = re.split(r'\W+', path)
         path = '-'.join(path)
         return path + '_files'
-    if ext == '.html' and file is True:
-        path = re.split(r'\W+', path)
-        path = '-'.join(path)
-        return path + ext
     full_path = re.split(r'\W+', url)
     return '-'.join(full_path)
 
