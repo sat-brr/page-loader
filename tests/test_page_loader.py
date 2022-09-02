@@ -33,7 +33,7 @@ def test_download_pics():
         pic3 = open('tests/fixtures/pics/pic3.png', 'rb').read()
         m.get('https://testing.ru/tests/fixtures/pics/pic3.png', content=pic3)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            page_loader.download(tmp_dir, 'https://testing.ru/')
+            page_loader.download('https://testing.ru/', tmp_dir)
             new_dir = tmp_dir + '/testing-ru_files'
             html_file = tmp_dir + '/testing-ru.html'
             file1 = new_dir + '/testing-ru-tests-fixtures-pic1.png'
@@ -57,7 +57,7 @@ def test_download_lnk_scr():
         m.get('https://testing.ru/tests/fixtures/scripts/script1.js',
               content=script1)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            page_loader.download(tmp_dir, 'https://testing.ru')
+            page_loader.download('https://testing.ru', tmp_dir)
             new_dir = tmp_dir + '/testing-ru_files'
             file1 = new_dir + '/testing-ru-tests-fixtures-links-link1.css'
             file2 = new_dir + '/testing-ru-tests-fixtures-scripts-script1.js'
@@ -77,10 +77,10 @@ def test_bad_response():
         m.get('https://testing.ru/', status_code=400)
         with tempfile.TemporaryDirectory() as tmp_dir:
             with pytest.raises(SystemExit):
-                page_loader.download(tmp_dir, 'https://testing.ru/')
-                page_loader.download(tmp_dir, 'https://testing.ru/')
-                page_loader.download(tmp_dir, 'https://testing.ru/')
-                page_loader.download(tmp_dir, 'https://testing.ru/')
+                page_loader.download('https://testing.ru/', tmp_dir)
+                page_loader.download('https://testing.ru/', tmp_dir)
+                page_loader.download('https://testing.ru/', tmp_dir)
+                page_loader.download('https://testing.ru/', tmp_dir)
 
 
 def test_dir_errors():
@@ -94,6 +94,6 @@ def test_dir_errors():
             os.mkdir(locked)
             os.chmod(locked, 000)
             with pytest.raises(SystemExit):
-                page_loader.download(fake_dir, 'https://testing.ru/')
-                page_loader.download(file_path, 'https://testing.ru/')
-                page_loader.download(locked, 'https://testing.ru/')
+                page_loader.download('https://testing.ru/', fake_dir)
+                page_loader.download('https://testing.ru/', file_path)
+                page_loader.download('https://testing.ru/', locked)

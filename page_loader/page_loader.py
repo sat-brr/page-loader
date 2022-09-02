@@ -88,25 +88,22 @@ def get_files(page, url, dir):
 
 def create_html_file(dir, url):
     try:
-        try:
-            logger.info(f'Requesting url: {url}')
-            data = requests.get(url)
-            data.raise_for_status()
-            path = f'{dir}/{make_path(url)}.html'
-            with open(path, 'w+') as file:
-                file.write(data.text)
-            logger.info(f'Write html file: {path}')
-            return path
-        except (requests.exceptions.ConnectionError,
+        logger.info(f'Requesting url: {url}')
+        data = requests.get(url)
+        data.raise_for_status()
+        path = f'{dir}/{make_path(url)}.html'
+        with open(path, 'w+') as file:
+            file.write(data.text)
+        logger.info(f'Write html file: {path}')
+        return path
+    except (requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError,
                 requests.exceptions.Timeout) as err:
-            logger.error(f'Connection error from "{url}". Errcode: {err}')
-            raise KnownError() from err
-        except requests.exceptions.MissingSchema as err:
-            logger.error(f'Invalid URL {url}: No scheme supplied.')
-            raise KnownError() from err
-    except KnownError:
-        raise SystemExit
+        logger.error(f'Connection error from "{url}". Errcode: {err}')
+        raise KnownError() from err
+    except requests.exceptions.MissingSchema as err:
+        logger.error(f'Invalid URL {url}: No scheme supplied.')
+        raise KnownError() from err
 
 
 def get_domain(url):
@@ -130,28 +127,27 @@ def make_path(url, file=False, dir=False):
         path = re.split(r'\W+', path)
         path = '-'.join(path)
         return path + '_files'
-    if ext == '.html':
+    if ext == '.html' and file == True:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
-        return path
+        return path + ext
     full_path = re.split(r'\W+', url)
     return '-'.join(full_path)
 
 
 def download(url, dir):
     try:
-        try:
-            open(dir, 'r')
-            logger.error('Invalid directory path specified!')
-            raise KnownError()
-        except (FileNotFoundError, PermissionError) as err:
-            logger.error("Directory does not exist or access denied. "
-                         f'Error code: {err}')
-            raise KnownError() from err
-        except IsADirectoryError:
+        open(dir, 'r')
+        logger.error('Invalid directory path specified!')
+        raise KnownError()
+    except (FileNotFoundError, PermissionError) as err:
+        logger.error("Directory does not exist or access denied. "
+                     f'Error code: {err}')
+        raise err
+    except IsADirectoryError:
             pass
-    except KnownError:
-        raise SystemExit
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
     logger.info(f"Page was downloaded as '{path_to_url}'.")
+
+download('https://www.gov.uk', '/home/sat/python-project-lvl3/tmp1')
