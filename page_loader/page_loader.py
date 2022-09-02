@@ -97,8 +97,8 @@ def create_html_file(dir, url):
         logger.info(f'Write html file: {path}')
         return path
     except (requests.exceptions.ConnectionError,
-                requests.exceptions.HTTPError,
-                requests.exceptions.Timeout) as err:
+            requests.exceptions.HTTPError,
+            requests.exceptions.Timeout) as err:
         logger.error(f'Connection error from "{url}". Errcode: {err}')
         raise KnownError() from err
     except requests.exceptions.MissingSchema as err:
@@ -127,7 +127,7 @@ def make_path(url, file=False, dir=False):
         path = re.split(r'\W+', path)
         path = '-'.join(path)
         return path + '_files'
-    if ext == '.html' and file == True:
+    if ext == '.html' and file is True:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
         return path + ext
@@ -145,7 +145,7 @@ def download(url, dir):
                      f'Error code: {err}')
         raise err
     except IsADirectoryError:
-            pass
+        pass
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
     logger.info(f"Page was downloaded as '{path_to_url}'.")
