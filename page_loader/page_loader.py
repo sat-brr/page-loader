@@ -120,10 +120,10 @@ def make_path(url, file=False, dir=False):
     if url[-1] == '/':
         url = url[:-1]
     path, ext = os.path.splitext(url)
-    if ext == '.html' and file is True:
+    if not ext and file is True:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
-        return path + ext
+        return path + '.html'
     if ext == '.html':
         path = re.split(r'\W+', path)
         path = '-'.join(path)
