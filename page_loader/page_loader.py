@@ -149,3 +149,4 @@ def download(url, dir):
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
     logger.info(f"Page was downloaded as '{path_to_url}'.")
+    return path_to_url
