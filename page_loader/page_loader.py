@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import logging
 from progress.bar import Bar
 import sys
-from logger import install_logger
+from page_loader.logger import install_logger
 TAGS = ('img', 'link', 'script')
 install_logger()
 
