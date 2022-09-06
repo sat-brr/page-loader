@@ -5,20 +5,22 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import logging
 from progress.bar import Bar
+import sys
+from logger import install_logger
 TAGS = ('img', 'link', 'script')
-
+install_logger()
 
 logger = logging.getLogger('page-loader')
-logger.setLevel(logging.DEBUG)
-f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
-sh = logging.StreamHandler()
-sh.setLevel(logging.INFO)
-sh.setFormatter(f)
-logger.addHandler(sh)
+# logger.setLevel(logging.DEBUG)
+# f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
+# sh = logging.StreamHandler()
+# sh.setLevel(logging.INFO)
+# sh.setFormatter(f)
+# logger.addHandler(sh)
 
 
 class KnownError(Exception):
-    pass
+    SystemExit()
 
 
 def find_by_tag(parse):
@@ -102,9 +104,11 @@ def create_html_file(dir, url):
             requests.exceptions.HTTPError,
             requests.exceptions.Timeout) as err:
         logger.error(f'Connection error from "{url}". Errcode: {err}')
+        sys.exit(1)
         raise KnownError() from err
     except requests.exceptions.MissingSchema as err:
         logger.error(f'Invalid URL {url}: No scheme supplied.')
+        sys.exit(1)
         raise KnownError() from err
 
 
@@ -145,11 +149,13 @@ def download(url, dir):
     try:
         open(dir, 'r')
         logger.error('Invalid directory path specified!')
+        sys.exit(1)
         raise KnownError()
     except (FileNotFoundError, PermissionError) as err:
         logger.error("Directory does not exist or access denied. "
                      f'Error code: {err}')
-        raise err
+        sys.exit(1)
+        #raise KnownError() from err
     except IsADirectoryError:
         pass
     path_to_url = create_html_file(dir, url)
