@@ -9,7 +9,7 @@ TAGS = ('img', 'link', 'script')
 
 
 logger = logging.getLogger('page-loader')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
 sh = logging.StreamHandler()
 sh.setLevel(logging.INFO)
@@ -156,3 +156,9 @@ def download(url, dir):
     get_files(path_to_url, url, dir)
     logger.info(f"Page was downloaded as '{path_to_url}'.")
     return path_to_url
+
+
+# test_path = "/home/sat/python-project-lvl3/tmp1"
+# test_url = "https://www.gov.uk"
+
+# download(test_url, test_path)
