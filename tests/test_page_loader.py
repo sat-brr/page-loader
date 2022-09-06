@@ -5,10 +5,6 @@ import tempfile
 from page_loader import page_loader
 import pytest
 
-TEST_LINK = 'https://text.ru/testing/txt.html'
-MAIN_DIR = os.getcwd()
-FIX_RES = 'text-ru-testing-txt.html'
-
 
 def test_make_name():
     assert page_loader.make_path('http://www.gov.uk/') == \
@@ -71,12 +67,12 @@ def test_download_lnk_scr():
 
 def test_bad_response():
     with requests_mock.Mocker()as m:
-        m.get('https://testing.ru/', status_code=404)
+        m.get('testing.ru/', status_code=404)
         m.get('https://testing.ru/', status_code=500)
         m.get('https://testing.ru/', status_code=502)
         m.get('https://testing.ru/', status_code=400)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with pytest.raises(SystemExit):
+            with pytest.raises(Exception):
                 page_loader.download('https://testing.ru/', tmp_dir)
                 page_loader.download('https://testing.ru/', tmp_dir)
                 page_loader.download('https://testing.ru/', tmp_dir)
@@ -92,8 +88,8 @@ def test_dir_errors():
             open(f'{tmp_dir}/123.txt', 'w')
             locked = f'{tmp_dir}/locked'
             os.mkdir(locked)
-            os.chmod(locked, 000)
-            with pytest.raises(SystemExit):
+            os.chmod(locked, 0o000)
+            with pytest.raises(Exception):
+                page_loader.download('https://testing.ru/', locked)
                 page_loader.download('https://testing.ru/', fake_dir)
                 page_loader.download('https://testing.ru/', file_path)
-                page_loader.download('https://testing.ru/', locked)
