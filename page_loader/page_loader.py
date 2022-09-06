@@ -5,18 +5,12 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import logging
 from progress.bar import Bar
-import sys
 from page_loader.logger import install_logger
 TAGS = ('img', 'link', 'script')
-install_logger()
 
+
+install_logger()
 logger = logging.getLogger('page-loader')
-# logger.setLevel(logging.DEBUG)
-# f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
-# sh = logging.StreamHandler()
-# sh.setLevel(logging.INFO)
-# sh.setFormatter(f)
-# logger.addHandler(sh)
 
 
 class KnownError(Exception):
@@ -105,11 +99,9 @@ def create_html_file(dir, url):
             requests.exceptions.Timeout) as err:
         logger.error(f'Connection error from "{url}". Errcode: {err}')
         raise err
-        raise KnownError() from err
     except requests.exceptions.MissingSchema as err:
         logger.error(f'Invalid URL {url}: No scheme supplied.')
         raise err
-        raise KnownError() from err
 
 
 def get_domain(url):
@@ -154,16 +146,9 @@ def download(url, dir):
         logger.error("Directory does not exist or access denied. "
                      f'Error code: {err}')
         raise err
-        #raise KnownError() from err
     except IsADirectoryError:
         pass
     path_to_url = create_html_file(dir, url)
     get_files(path_to_url, url, dir)
     logger.info(f"Page was downloaded as '{path_to_url}'.")
     return path_to_url
-
-
-# test_path = "/home/sat/python-project-lvl3/tmp1"
-# test_url = "https://www.gov.uk"
-
-# download(test_url, test_path)
