@@ -2,7 +2,7 @@
 from page_loader.logger import install_logger
 from page_loader import downloader
 from page_loader.cli import parsing_args
-
+import sys
 
 logger = install_logger()
 
@@ -13,7 +13,7 @@ def main():
         downloader.download(args.link, args.output)
     except Exception as err:
         logger.debug(err)
-        SystemExit(err)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
