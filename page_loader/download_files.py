@@ -53,11 +53,12 @@ def get_files(page, url, dir):
         full_url = domain + elem_url
         local_path_file = make_path(full_url, file=True)
         full_path_to_file = f'{full_path}/{local_path_file}'
-        with open(full_path_to_file, 'wb') as file:
-            try:
-                file.write(requests.get(full_url).content)
-            except Exception:
-                logger.warning(f'Download file ({full_url}) fail !!!')
+        try:
+            data = requests.get(full_url).content
+            with open(full_path_to_file, 'wb') as file:
+                file.write(data)
+        except Exception:
+            logger.warning(f'Download file ({full_url}) fail !!!')
         bar.next()
         element[key] = f"{new_dir}/{local_path_file}"
     saved_changes = soup.prettify()
