@@ -1,5 +1,5 @@
 import requests
-from progress.bar import Bar 
+from progress.bar import Bar
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from page_loader.scripts.page_load import logger
