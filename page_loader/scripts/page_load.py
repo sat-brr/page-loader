@@ -13,7 +13,7 @@ def main():
         downloader.download(args.link, args.output)
     except Exception as err:
         logger.debug(err)
-        SystemExit(1)
+        SystemExit(err)
 
 
 if __name__ == '__main__':
