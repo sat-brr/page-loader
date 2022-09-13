@@ -1,23 +1,28 @@
 import requests
-from page_loader.scripts.page_load import logger
-from page_loader.work_with_paths import make_path
+import logging
+from page_loader.work_with_urls import make_path
+import os
+
+
+logger = logging.getLogger('page-loader')
+
+
+def get_data(url):
+    logger.info(f'Requesting url: {url}')
+    data = requests.get(url)
+    data.raise_for_status()
+    return data
+
+
+def write_to_file(path, data):
+    logger.info(f'Write html file: {path}')
+    with open(path, 'w+') as file:
+        file.write(data.text)
 
 
 def create_html_file(dir, url):
-    try:
-        logger.info(f'Requesting url: {url}')
-        data = requests.get(url)
-        data.raise_for_status()
-        path = f'{dir}/{make_path(url)}.html'
-        with open(path, 'w+') as file:
-            file.write(data.text)
-        logger.info(f'Write html file: {path}')
-        return path
-    except (requests.exceptions.ConnectionError,
-            requests.exceptions.HTTPError,
-            requests.exceptions.Timeout) as err:
-        logger.error(f'Connection error from "{url}". Errcode: {err}')
-        raise err
-    except requests.exceptions.MissingSchema as err:
-        logger.error(f'Invalid URL {url}: No scheme supplied.')
-        raise err
+    data = get_data(url)
+    url_to_path = f'{make_path(url)}.html'
+    full_path = os.path.join(dir, url_to_path)
+    write_to_file(full_path, data)
+    return full_path

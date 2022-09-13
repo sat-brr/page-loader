@@ -1,18 +1,42 @@
 #!/usr/bin/env python3
-from page_loader.logger import install_logger
+import logging
+from requests import exceptions as error
 from page_loader import downloader
 from page_loader.cli import parsing_args
 import sys
 
-logger = install_logger()
+
+def install_logger():
+    logger = logging.getLogger('page-loader')
+    logger.setLevel(logging.DEBUG)
+    f = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
+    sh = logging.StreamHandler(sys.stdout)
+    sh.setLevel(logging.INFO)
+    sh.setFormatter(f)
+    logger.addHandler(sh)
+    return logger
 
 
 def main():
     args = parsing_args()
+    logger = install_logger()
     try:
         downloader.download(args.link, args.output)
+    except (error.ConnectionError,
+            error.HTTPError) as err:
+        logger.debug(err)
+        logger.error('Connection error. Details in logs.')
+    except (error.InvalidSchema,
+            error.MissingSchema) as err:
+        logger.debug(err)
+        logger.error('Missing schema. Details in logs.')
+    except (PermissionError, FileNotFoundError) as err:
+        logger.debug(err)
+        logger.error('Directory does not exist or access denied.')
     except Exception as err:
         logger.debug(err)
+        logger.error('Oops. Something went wrong.')
+    finally:
         sys.exit(1)
 
 

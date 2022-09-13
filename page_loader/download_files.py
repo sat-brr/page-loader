@@ -2,67 +2,58 @@ import requests
 from progress.bar import Bar
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from page_loader.scripts.page_load import logger
-from page_loader.work_with_paths import make_dir, make_path
+import logging
+from page_loader.work_with_urls import make_dir, make_path, get_domain
 
 
-TAGS = ('img', 'link', 'script')
+TAGS = {'img': 'src', 'link': 'href', 'script': 'src'}
+logger = logging.getLogger('page-loader')
 
 
 def find_by_tag(parse):
-    result = []
-    for tag in TAGS:
-        if tag == 'link':
-            found = parse.find_all(tag, href=True)
-            result.extend(found)
-            continue
-        found = parse.find_all(tag, src=True)
-        result.extend(found)
+    result = {}
+    for key, value in TAGS.items():
+        url = parse.find_all(key, {value: True})
+        if value not in result:
+            result.setdefault(value, url)
+        else:
+            result[value].extend(url)
     return result
 
 
-def get_element_url(elem):
-    try:
-        elem_url = elem['src']
-        return elem_url, 'src'
-    except KeyError:
-        elem_url = elem['href']
-        return elem_url, 'href'
-
-
-def get_domain(url):
-    parse = urlparse(url)
-    scheme = parse[0] + '://'
-    host = parse[1]
-    return scheme + host
+def download_file(source):
+    logger.info('Download files...')
+    bar = Bar('Downloading:', max=len(source))
+    for url, path in source.items():
+        with open(path, 'wb') as file:
+            data = requests.get(url).content
+            file.write(data)
+        bar.next()
+    bar.finish()
+    logger.info('Downloading files successful!')
 
 
 def get_files(page, url, dir):
     new_dir, full_path = make_dir(dir, url)
-    logger.info('Download files...')
     domain = get_domain(url)
     open_page = open(page)
     soup = BeautifulSoup(open_page, 'html.parser')
     elements = find_by_tag(soup)
-    bar = Bar('Downloading:', max=len(elements))
-    for element in elements:
-        elem_url, key = get_element_url(element)
-        domain_lnk = get_domain(elem_url)
-        if domain_lnk == domain or domain_lnk == '://':
-            elem_url = ''.join(urlparse(elem_url)[2:])
-        full_url = domain + elem_url
-        local_path_file = make_path(full_url, file=True)
-        full_path_to_file = f'{full_path}/{local_path_file}'
-        try:
-            data = requests.get(full_url).content
-            with open(full_path_to_file, 'wb') as file:
-                file.write(data)
-            element[key] = f"{new_dir}/{local_path_file}"
-        except Exception:
-            logger.warning(f'Download file ({full_url}) fail !!!')
-        bar.next()
+    urls_for_downloading = {}
+    for atr, elem in elements.items():
+        for source in elem:
+            source_url = source[atr]
+            domain_lnk = get_domain(source_url)
+            if domain_lnk == domain or domain_lnk == '://':
+                source_url = ''.join(urlparse(source_url)[2:])
+            else:
+                continue
+            source_url = domain + source_url
+            local_path_file = make_path(source_url, file=True)
+            full_path_to_file = f'{full_path}/{local_path_file}'
+            urls_for_downloading.setdefault(source_url, full_path_to_file)
+            source[atr] = f"{new_dir}/{local_path_file}"
+    download_file(urls_for_downloading)
     saved_changes = soup.prettify()
     open_page.close()
-    bar.finish()
-    logger.info('Downloading files successful!')
     return saved_changes
