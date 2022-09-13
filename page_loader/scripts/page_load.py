@@ -26,17 +26,19 @@ def main():
             error.HTTPError) as err:
         logger.debug(err)
         logger.error('Connection error. Details in logs.')
+        sys.exit(1)
     except (error.InvalidSchema,
             error.MissingSchema) as err:
         logger.debug(err)
         logger.error('Missing schema. Details in logs.')
+        sys.exit(1)
     except (PermissionError, FileNotFoundError) as err:
         logger.debug(err)
         logger.error('Directory does not exist or access denied.')
+        sys.exit(1)
     except Exception as err:
         logger.debug(err)
         logger.error('Oops. Something went wrong.')
-    finally:
         sys.exit(1)
 
 
