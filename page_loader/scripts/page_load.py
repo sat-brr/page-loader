@@ -12,7 +12,7 @@ def main():
     args = parsing_args()
     logging.basicConfig(level=logging.INFO,
                         format=FORMATTER,
-                        handlers=[logging.StreamHandler(), ])
+                        handlers=[logging.StreamHandler(sys.stdout), ])
     try:
         path_to_html = downloader.download(args.link, args.output)
         logging.info(f"Page was downloaded as '{path_to_html}'.")
