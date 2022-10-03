@@ -4,9 +4,6 @@ from urllib.parse import urlparse
 import logging
 
 
-logger = logging.getLogger('page-loader')
-
-
 def get_domain(url):
     parse = urlparse(url)
     scheme = parse[0] + '://'
@@ -16,13 +13,10 @@ def get_domain(url):
 
 def make_dir(dir, url):
     new_dir = make_path(url, dir=True)
-    full_path = f'{dir}/{new_dir}'
-    logger.info(f'Directory {full_path} creating...')
-    if os.path.exists(full_path):
-        logger.info('Directory exists')
-    else:
+    full_path = os.path.join(dir, new_dir)
+    if not os.path.exists(full_path):
         os.mkdir(full_path)
-        logger.info('Directory created')
+    logging.info(f'output path: {full_path}')
     return new_dir, full_path
 
 
