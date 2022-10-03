@@ -52,16 +52,16 @@ def test_downloader(test_url, url_data):
 
 @pytest.mark.parametrize("code", [400, 404, 500, 502])
 def test_bad_response(code):
-    with requests_mock.Mocker()as m:
-        m.get(TEST_URL, status_code=code)
+    with requests_mock.Mocker()as mock:
+        mock.get(TEST_URL, status_code=code)
         with tempfile.TemporaryDirectory() as tmp_dir:
             with pytest.raises(Exception):
                 downloader.download(TEST_URL, tmp_dir)
 
 
 def test_dir_errors():
-    with requests_mock.Mocker()as m:
-        m.get(TEST_URL, text='404')
+    with requests_mock.Mocker()as mock:
+        mock.get(TEST_URL, text='404')
         with tempfile.TemporaryDirectory() as tmp_dir:
             fake_dir = os.path.join(tmp_dir, '123')
             file_path = os.path.join(tmp_dir, '123.txt')
