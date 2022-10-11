@@ -16,7 +16,7 @@ def process_html_data(url, dir):
     path_to_html = os.path.join(dir, path_to_html)
     domain = get_domain(url)
 
-    dir_name, files_dir = create_dir(dir, local_path_to_page)
+    dir_name, dir_path = create_dir(dir, local_path_to_page)
 
     soup = BeautifulSoup(page_data.text, 'html.parser')
     elements = {}
@@ -36,7 +36,7 @@ def process_html_data(url, dir):
                 source_url = ''.join(urlparse(source_url)[2:])
                 source_url = domain + source_url
                 local_file_path = to_file(source_url)
-                full_path_to_file = os.path.join(files_dir, local_file_path)
+                full_path_to_file = os.path.join(dir_path, local_file_path)
                 assets.append((source_url, full_path_to_file))
                 source[atribut] = os.path.join(dir_name, local_file_path)
     html_data = soup.prettify()
