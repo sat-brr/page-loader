@@ -11,16 +11,20 @@ def get_domain(url):
     return scheme + host
 
 
-def make_dir(dir, url):
-    new_dir = make_path(url, dir=True)
-    full_path = os.path.join(dir, new_dir)
-    if not os.path.exists(full_path):
-        os.mkdir(full_path)
-    logging.info(f'output path: {full_path}')
-    return new_dir, full_path
+def create_dir(dir, path_to_html):
+    files_dir_name = path_to_html + '_files'
+    files_dir_path = os.path.join(dir, files_dir_name)
+    if not os.path.exists(files_dir_path):
+        os.mkdir(files_dir_path)
+    logging.info(f'output path: {files_dir_path}')
+    return files_dir_name, files_dir_path
 
 
-def make_path_to_file(path, ext):
+def to_file(url):
+    url = ''.join(urlparse(url)[1:])
+    if url[-1] == '/':
+        url = url[:-1]
+    path, ext = os.path.splitext(url)
     if not ext:
         path = re.split(r'\W+', path)
         path = '-'.join(path)
@@ -31,22 +35,11 @@ def make_path_to_file(path, ext):
         return path + ext
 
 
-def make_path_to_dir(path, ext):
-    path += ext
-    path = re.split(r'\W+', path)
-    path = '-'.join(path)
-    return path + '_files'
-
-
-def make_path(url, file=False, dir=False):
+def generate_page_path(url):
     url = ''.join(urlparse(url)[1:])
     if url[-1] == '/':
         url = url[:-1]
     path, ext = os.path.splitext(url)
-    if file:
-        return make_path_to_file(path, ext)
-    if dir:
-        return make_path_to_dir(path, ext)
     if ext == '.html':
         path = re.split(r'\W+', path)
         path = '-'.join(path)
