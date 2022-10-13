@@ -13,7 +13,7 @@ def get_domain(url):
 def to_dir(dir, path_to_html):
     dir_name = path_to_html + '_files'
     full_path = os.path.join(dir, dir_name)
-    return full_path
+    return dir_name, full_path
 
 
 def to_file(url):

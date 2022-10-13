@@ -24,10 +24,10 @@ def download(url, dir):
     page_path = generate_page_path(url)
     path_to_html = f'{generate_page_path(url)}.html'
     path_to_html = os.path.join(dir, path_to_html)
-    files_dir_path = to_dir(dir, page_path)
+    files_dir = to_dir(dir, page_path)
 
     logging.info(f'Requesting url: {url}')
-    html_data, assets = process_html_data(url, files_dir_path)
+    html_data, assets = process_html_data(url, files_dir)
 
     logging.info(f'output path: {os.path.abspath(dir)}')
 
@@ -35,7 +35,7 @@ def download(url, dir):
         html_file.write(html_data)
     logging.info(f'write html file: {path_to_html}')
 
-    if not os.path.exists(files_dir_path):
-        os.mkdir(files_dir_path)
+    if not os.path.exists(files_dir[1]):
+        os.mkdir(files_dir[1])
     download_assets(assets)
     return path_to_html
