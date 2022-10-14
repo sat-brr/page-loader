@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from page_loader.url import to_file, get_domain
+from page_loader.url import to_dir, to_file, get_domain
 import requests
 import os
 
@@ -8,13 +8,13 @@ import os
 TAGS = {'img': 'src', 'link': 'href', 'script': 'src'}
 
 
-def process_html_data(url, dir):
+def process_html_data(url):
     url_response = requests.get(url)
     url_response.raise_for_status()
 
     domain = get_domain(url)
     soup = BeautifulSoup(url_response.text, 'html.parser')
-    dir_name, dir_path = dir
+    assets_dir_name = to_dir(url)
 
     assets = []
     for tag, attribute in TAGS.items():
@@ -25,9 +25,8 @@ def process_html_data(url, dir):
             if domain_lnk == domain or domain_lnk == '://':
                 source_url = ''.join(urlparse(source_url)[2:])
                 source_url = domain + source_url
-                local_file_path = to_file(source_url)
-                full_path_to_file = os.path.join(dir_path, local_file_path)
-                assets.append((source_url, full_path_to_file))
-                source[attribute] = os.path.join(dir_name, local_file_path)
+                file_path = to_file(source_url)
+                assets.append((source_url, file_path))
+                source[attribute] = os.path.join(assets_dir_name, file_path)
     html_data = soup.prettify()
     return html_data, assets

@@ -10,10 +10,13 @@ def get_domain(url):
     return scheme + host
 
 
-def to_dir(dir, path_to_html):
-    dir_name = path_to_html + '_files'
-    full_path = os.path.join(dir, dir_name)
-    return dir_name, full_path
+def to_dir(url):
+    path = ''.join(urlparse(url)[1:])
+    if url[-1] == '/':
+        url = url[:-1]
+    path = re.split(r'\W+', path)
+    path = '-'.join(path)
+    return path + '_files'
 
 
 def to_file(url):

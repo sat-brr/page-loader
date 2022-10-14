@@ -30,16 +30,16 @@ def test_downloader(test_url, url_data, tmpdir):
         html_file = downloader.download(TEST_URL, tmpdir)
 
         path_url = generate_page_path(TEST_URL)
-        files_dir = to_dir(tmpdir, path_url)
+        files_dir = os.path.join(tmpdir, to_dir(TEST_URL))
         for path, url in ASSETS.items():
             path = os.path.join(FIXTURES_PATH, path)
             file_path = to_file(url)
             local_path = f'{path_url}-{file_path}'
-            full_path_to_file = os.path.join(files_dir[1], local_path)
+            full_path_to_file = os.path.join(files_dir, local_path)
             assert exists(full_path_to_file)
-        assert exists(files_dir[1])
+        assert exists(files_dir)
         assert exists(html_file)
-        files = os.listdir(files_dir[1])
+        files = os.listdir(files_dir)
         assert len(files) == 5
 
 
