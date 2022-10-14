@@ -25,8 +25,8 @@ def process_html_data(url):
             if domain_lnk == domain or domain_lnk == '://':
                 source_url = ''.join(urlparse(source_url)[2:])
                 source_url = domain + source_url
-                file_path = to_file(source_url)
-                assets.append((source_url, file_path))
-                source[attribute] = os.path.join(assets_dir_name, file_path)
+                path_to_file = to_file(source_url)
+                assets.append((source_url, path_to_file))
+                source[attribute] = os.path.join(assets_dir_name, path_to_file)
     html_data = soup.prettify()
     return html_data, assets

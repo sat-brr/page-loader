@@ -28,13 +28,13 @@ def download_assets(assets, dir, url):
 
 
 def download(url, dir):
-    path_to_html = f'{generate_page_path(url)}.html'
-    path_to_html = os.path.join(dir, path_to_html)
-
     logging.info(f'Requesting url: {url}')
     html_data, assets = process_html_data(url)
 
     logging.info(f'output path: {os.path.abspath(dir)}')
+
+    path_to_html = f'{generate_page_path(url)}.html'
+    path_to_html = os.path.join(dir, path_to_html)
 
     with open(path_to_html, 'w+') as html_file:
         html_file.write(html_data)
