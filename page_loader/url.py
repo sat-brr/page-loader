@@ -34,9 +34,3 @@ def generate_page_path(url):
         return path
     full_path = re.split(r'\W+', url)
     return '-'.join(full_path)
-
-
-#url = 'https://www.test.ru/123.txt'
-#test1 = generate_page_path(url).split('-')
-#print(to_file(url))
-#print(pathlib.Path(url).name)

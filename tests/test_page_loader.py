@@ -16,12 +16,13 @@ ASSETS = {'pic1.png': "pictures/pic1.png",
           'links/link1.css': 'assets/link1.css'}
 
 
-@pytest.mark.parametrize('test_url, url_data',
+@pytest.mark.parametrize('test_url, test_url_path',
                          [(TEST_URL,
-                          open(TEST_PAGE_PATH, 'r').read())])
-def test_downloader(test_url, url_data, tmpdir):
+                          TEST_PAGE_PATH)])
+def test_downloader(test_url, test_url_path, tmpdir):
     with requests_mock.Mocker() as mock:
-        mock.get(test_url, text=url_data)
+        test_url_data = open(test_url_path, 'r').read()
+        mock.get(test_url, text=test_url_data)
         for path, url in ASSETS.items():
             path = os.path.join(FIXTURES_PATH, path)
             with open(path, 'rb') as pic:
