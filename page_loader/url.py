@@ -11,33 +11,25 @@ def get_domain(url):
 
 
 def to_dir(url):
-    path = ''.join(urlparse(url)[1:])
-    if url[-1] == '/':
-        url = url[:-1]
-    path = re.split(r'\W+', path)
-    path = '-'.join(path)
-    return path + '_files'
+    dir_path = generate_page_path(url) + '_files'
+    return dir_path
 
 
 def to_file(url):
-    url = ''.join(urlparse(url)[1:])
-    if url[-1] == '/':
-        url = url[:-1]
-    path, ext = os.path.splitext(url)
-    if not ext:
-        path = re.split(r'\W+', path)
-        path = '-'.join(path)
-        return path + '.html'
-    else:
-        path = re.split(r'\W+', path)
-        path = '-'.join(path)
-        return path + ext
+    _, ext = os.path.splitext(url)
+    return generate_page_path(url) + ext if not ext else generate_page_path(url)
+    # url = url.strip('/')
+    # url, ext = os.path.splitext(url)
+    # file_path = generate_page_path(url)
+
+    # if ext:
+    #     return file_path + ext
+    # return file_path + '.html'
 
 
 def generate_page_path(url):
+    url = url.strip('/')
     url = ''.join(urlparse(url)[1:])
-    if url[-1] == '/':
-        url = url[:-1]
     path, ext = os.path.splitext(url)
     if ext == '.html':
         path = re.split(r'\W+', path)
@@ -45,3 +37,9 @@ def generate_page_path(url):
         return path
     full_path = re.split(r'\W+', url)
     return '-'.join(full_path)
+
+
+#url = 'https://www.test.ru/123.txt'
+#test1 = generate_page_path(url).split('-')
+#print(to_file(url))
+#print(pathlib.Path(url).name)
