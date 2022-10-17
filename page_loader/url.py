@@ -16,15 +16,12 @@ def to_dir(url):
 
 
 def to_file(url):
-    _, ext = os.path.splitext(url)
-    return generate_page_path(url) + ext if not ext else generate_page_path(url)
-    # url = url.strip('/')
-    # url, ext = os.path.splitext(url)
-    # file_path = generate_page_path(url)
+    url, ext = os.path.splitext(url)
+    file_path = generate_page_path(url)
 
-    # if ext:
-    #     return file_path + ext
-    # return file_path + '.html'
+    if ext:
+        return file_path + ext
+    return file_path + '.html'
 
 
 def generate_page_path(url):
